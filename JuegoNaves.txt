@@ -1,0 +1,10 @@
+Juego Nave espacial:
+
+Tenemos un canvas del tamaño que queramos.
+Tenemos arriba a la derecha un points que son los puntos y vidas que empiezan en 3.
+La nave esta en la parte izquierda y se mueve de arriba a abajo.
+Los enemigos empiezan en una posicion aleatoria en la parte derecha de la pantalla y se mueven a la izquierda a velocidad constante.
+Level se incrementa cada cierto tiempo (numero de iteraciones del render, por ejemplo 200 o lo que sea, subimos de nivel.)
+A mayor nivel los rectangulos malos se crean mas rapido.
+Los puntos van aumentando con el tiempo.
+Si las vidas llegan a 0 hay que poner Game Over.
