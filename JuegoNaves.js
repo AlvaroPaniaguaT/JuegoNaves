@@ -1,5 +1,4 @@
 var posHeroY = 200;
-var posHeroX = 0;
 var dt = 100; // Tiempo de refresco en milisegundos.
 var enemySpeed = 50000; // pixeles por segundo
 var ms2sec = 1000; // Para pasar de segundos a milisegundos.
@@ -7,11 +6,12 @@ var canvas;
 var ctx;
 var shapes = [];
 const desp = 25;
-var count = 0;
-var level = 0;
+var count = 1;
+var level = 1;
 var heal = 3;
-var click = 8;
+var modulo = 8;
 var leftLimit = -10;
+var scale = 40;
 var enemyShip = new Image();
 var heroShip = new Image();
 
@@ -24,16 +24,16 @@ function Hero(id, y, rad, color){
 
     this.draw = function(){
         heroShip.src = "Game_Fighter.png";
-        ctx.drawImage(heroShip, this.x, this.y, 40, 40);
+        ctx.drawImage(heroShip, this.x, this.y, scale, scale);
     }
 
     this.move = function(despY){
         this.y = this.y + despY;
-        if((this.y - this.rad) < 0){
-            this.y = this.rad;
+        if((this.y) < 0){
+            this.y = 5;
         }
-        if((this.y + this.rad) >= canvas.height){
-            this.y = canvas.height - this.rad;
+        if((this.y + scale) >= canvas.height){
+            this.y = canvas.height - (scale + 5);
         }
         //drawShapes();
     }
@@ -50,13 +50,11 @@ function Enemy(id, x, y, sx, sy, color){
     this.draw = function(){
         if((this.y + this.sy) < canvas.height ){
             enemyShip.src = "starship.png";
-            ctx.drawImage(enemyShip, this.x, this.y, 40, 40);
-            //ctx.fillStyle = this.color;
-            //ctx.fillRect(this.x, this.y, this.sx, this.sy);
+            ctx.drawImage(enemyShip, this.x, this.y, this.sx, this.sy);
         }else{
-            ctx.fillStyle = this.color;
             this.y = canvas.height - this.sy;
-            ctx.fillRect(this.x, this.y, this.sx, this.sy);
+            enemyShip.src = "starship.png";
+            ctx.drawImage(enemyShip, this.x, this.y, scale, scale);
         }  
     }
 
@@ -67,7 +65,11 @@ function Enemy(id, x, y, sx, sy, color){
 }
 
 function gameOver(){
-    alert("GAME OVER");
+    var gOverImg = new Image(1200,400);
+    gOverImg.src = "gameover.png"
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(gOverImg, 0,0, canvas.width, canvas.height);
+    alert("Pulsa para reiniciar.");
     document.location.reload();
 }
 
@@ -76,7 +78,7 @@ function moveEnemies(){
     var i;
     
     for(i = 1; i < shapes.length; i++){
-        if((shapes[i].x) > 0 ){
+        if((shapes[i].x) >= 0 ){
             shapes[i].move(-(enemySpeed/ms2sec));
         }else{
             shapes.splice(i,1);
@@ -92,16 +94,17 @@ function checkCollides(){
     var posRight;
     var i;
     
-    posBack = shapes[0].x - shapes[0].rad;
-    posFront = shapes[0].x + shapes[0].rad;
-    posLeft = shapes[0].y - shapes[0].rad;
-    posRight = shapes[0].y + shapes[0].rad;
+    posBack = shapes[0].x;
+    posFront = shapes[0].x + scale;
+    posLeft = shapes[0].y;
+    posRight = shapes[0].y + scale;
 
     for(i = 1; i < shapes.length; i++){
-        if(((shapes[i].x + shapes[i].sx) <= posFront)){
-            if(((shapes[i].y + shapes[i].sy) <= posRight) && ((shapes[i].y + shapes[i].sy) >= posLeft)){
+        if(((shapes[i].x + scale) <= posFront)){
+            if(((shapes[i].y) <= posRight) && ((shapes[i].y + shapes[i].sy) >= posLeft)){
                 if(heal > 0){                
                     heal = heal - 1;
+                    shapes.splice(i,1);
                     if(heal === 0){
                         gameOver();
                     }
@@ -155,8 +158,8 @@ function keyHandler(event) {
 
 function render() {
     var obj = getShape("hero");
-    if((count === 1) || ((count % click) === 0 )){
-        shapes.push(new Enemy("Enemy"+count , canvas.width, 400*(Math.random()), 40, 20, 'rgba(255, 0, 0, 0.5)'));
+    if(((count % modulo) === 0 )){
+        shapes.push(new Enemy("Enemy"+count , canvas.width, 400*(Math.random()), scale, scale, 'rgba(255, 0, 0, 0.5)'));
     }
     moveEnemies();
     checkCollides();
@@ -166,7 +169,9 @@ function render() {
         enemySpeed = enemySpeed + 10000;
         leftLimit = leftLimit - 10;
         if((level % 2) === 0){
-            click = click - 1;
+            if(modulo !== 0){
+                modulo = modulo - 1;
+            }
         }
     }
     count++;
@@ -184,7 +189,7 @@ function main(){
     ctx = canvas.getContext('2d');
     document.addEventListener('keydown', keyHandler, false);
     ctx.drawImage(img,0,0, canvas.width, canvas.height);
-    shapes.push(new Hero("hero", posHeroY, 20, 'rgba(0, 0, 255, 1)'));
+    shapes.push(new Hero("hero", posHeroY, 10, 'rgba(0, 0, 255, 1)'));
 
     setInterval(render, dt);
 }
