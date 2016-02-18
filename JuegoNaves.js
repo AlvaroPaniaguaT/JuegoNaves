@@ -11,6 +11,9 @@ var count = 0;
 var level = 0;
 var heal = 3;
 var click = 8;
+var leftLimit = -10;
+var enemyShip = new Image();
+var heroShip = new Image();
 
 function Hero(id, y, rad, color){
     this.id = id;
@@ -20,10 +23,8 @@ function Hero(id, y, rad, color){
     this.color = color;
 
     this.draw = function(){
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.rad, 0, 2 * Math.PI, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        heroShip.src = "Game_Fighter.png";
+        ctx.drawImage(heroShip, this.x, this.y, 40, 40);
     }
 
     this.move = function(despY){
@@ -34,7 +35,7 @@ function Hero(id, y, rad, color){
         if((this.y + this.rad) >= canvas.height){
             this.y = canvas.height - this.rad;
         }
-        drawShapes();
+        //drawShapes();
     }
 }
 
@@ -48,8 +49,10 @@ function Enemy(id, x, y, sx, sy, color){
     
     this.draw = function(){
         if((this.y + this.sy) < canvas.height ){
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.x, this.y, this.sx, this.sy);
+            enemyShip.src = "starship.png";
+            ctx.drawImage(enemyShip, this.x, this.y, 40, 40);
+            //ctx.fillStyle = this.color;
+            //ctx.fillRect(this.x, this.y, this.sx, this.sy);
         }else{
             ctx.fillStyle = this.color;
             this.y = canvas.height - this.sy;
@@ -59,7 +62,7 @@ function Enemy(id, x, y, sx, sy, color){
 
     this.move = function(despx){
         this.x = this.x + despx;
-        drawShapes();    
+        //drawShapes();    
     }
 }
 
@@ -73,8 +76,7 @@ function moveEnemies(){
     var i;
     
     for(i = 1; i < shapes.length; i++){
-        // hay que modificar el -10 por que hay un bug cuando subes la velocidad de los enemigos
-        if((shapes[i].x - enemySpeed/ms2sec) > -10 ){
+        if((shapes[i].x) > 0 ){
             shapes[i].move(-(enemySpeed/ms2sec));
         }else{
             shapes.splice(i,1);
@@ -110,7 +112,7 @@ function checkCollides(){
 }
 
 function drawShapes(){
-    var img = new Image(1200, 400);
+    var img = new Image();
     img.src = "fondo.jpg";
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -156,17 +158,18 @@ function render() {
     if((count === 1) || ((count % click) === 0 )){
         shapes.push(new Enemy("Enemy"+count , canvas.width, 400*(Math.random()), 40, 20, 'rgba(255, 0, 0, 0.5)'));
     }
-    checkCollides();
     moveEnemies();
-    count++;
+    checkCollides();
     drawShapes();
     if((count % 150) === 0){
         level = level + 1;
         enemySpeed = enemySpeed + 10000;
-        if(enemySpeed === 70000){
-            click = 5;
+        leftLimit = leftLimit - 10;
+        if((level % 2) === 0){
+            click = click - 1;
         }
     }
+    count++;
 }
 
 function main(){
