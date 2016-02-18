@@ -73,6 +73,7 @@ function moveEnemies(){
     var i;
     
     for(i = 1; i < shapes.length; i++){
+        // hay que modificar el -10 por que hay un bug cuando subes la velocidad de los enemigos
         if((shapes[i].x - enemySpeed/ms2sec) > -10 ){
             shapes[i].move(-(enemySpeed/ms2sec));
         }else{
