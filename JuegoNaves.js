@@ -1,6 +1,5 @@
 var posHeroY = 200;
 var posHeroX = 0;
-var posEnemyX = 1200;
 var dt = 100; // Tiempo de refresco en milisegundos.
 var enemySpeed = 50000; // pixeles por segundo
 var ms2sec = 1000; // Para pasar de segundos a milisegundos.
@@ -53,7 +52,7 @@ function Enemy(id, x, y, sx, sy, color){
             ctx.fillRect(this.x, this.y, this.sx, this.sy);
         }else{
             ctx.fillStyle = this.color;
-            this.x = canvas.height;
+            this.y = canvas.height - this.sy;
             ctx.fillRect(this.x, this.y, this.sx, this.sy);
         }  
     }
@@ -70,7 +69,7 @@ function gameOver(){
 }
 
 function moveEnemies(){
-    // mueve a todas las naves enemigas.
+    // mueve a todas las naves enemigas y comprueba si se salen del limite del canvas
     var i;
     
     for(i = 1; i < shapes.length; i++){
@@ -149,16 +148,16 @@ function keyHandler(event) {
 }
 
 function render() {
-
     var obj = getShape("hero");
     if((count === 1) || ((count % click) === 0 )){
-        shapes.push(new Enemy("Enemy"+count , posEnemyX, 400*(Math.random()), 40, 20, 'rgba(255, 0, 0, 0.5)'));
+        shapes.push(new Enemy("Enemy"+count , canvas.width, 400*(Math.random()), 40, 20, 'rgba(255, 0, 0, 0.5)'));
     }
     checkCollides();
     moveEnemies();
     count++;
     drawShapes();
     if((count % 150) === 0){
+        level = level + 1;
         enemySpeed = enemySpeed + 10000;
         if(enemySpeed === 70000){
             click = 5;
@@ -168,13 +167,15 @@ function render() {
 
 function main(){
     canvas = document.getElementById('espacioexterior');
+
     if (!canvas) {
         console.log('Failed to retrieve the <canvas> element');
         return false;
     }
+
     ctx = canvas.getContext('2d');
     document.addEventListener('keydown', keyHandler, false);
-
+    
     shapes.push(new Hero("hero", posHeroY, 20, 'rgba(0, 0, 255, 1)'));
 
     setInterval(render, dt);
