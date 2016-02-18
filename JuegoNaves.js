@@ -109,13 +109,16 @@ function checkCollides(){
 }
 
 function drawShapes(){
+    var img = new Image(1200, 400);
+    img.src = "fondo.jpg";
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     for(x in shapes){
         shapes[x].draw();
     }
 
     ctx.font = '10pt Arial';
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.fillText('LEVEL: '+ level , 1000, 20);
     ctx.fillText('LIVES: '+ heal , 1000, 40);
     ctx.fillText('POINTS: '+ count, 1000,60);
@@ -166,8 +169,9 @@ function render() {
 }
 
 function main(){
+    var img = new Image(1200,400);
     canvas = document.getElementById('espacioexterior');
-
+    img.src = "fondo.jpg";
     if (!canvas) {
         console.log('Failed to retrieve the <canvas> element');
         return false;
@@ -175,7 +179,7 @@ function main(){
 
     ctx = canvas.getContext('2d');
     document.addEventListener('keydown', keyHandler, false);
-    
+    ctx.drawImage(img,0,0, canvas.width, canvas.height);
     shapes.push(new Hero("hero", posHeroY, 20, 'rgba(0, 0, 255, 1)'));
 
     setInterval(render, dt);
